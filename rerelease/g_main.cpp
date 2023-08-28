@@ -945,6 +945,9 @@ inline void G_RunFrame_(bool main_loop)
 		G_RunEntity(ent);
 	}
 
+	// godmod - determine if a player is ready to be blessed
+	Rando_God();
+
 	// see if it is time to end a deathmatch
 	CheckDMRules();
 

@@ -412,6 +412,53 @@ bool Pickup_Pack(edict_t *ent, edict_t *other)
 }
 
 //======================================================================
+// godmod! -- randomly closen player recieves a blessing of
+// quad, quadfire, envirosuit, rebreather, and invisibility
+// but they are still mortal and can be killed!
+
+void Rando_God(void)
+{
+	gtime_t timeout;
+	edict_t *ent, *blessed;
+	edict_t **eligible_players = (edict_t **) alloca(sizeof(edict_t *) * game.maxclients);
+	size_t playercount = 0;
+	timeout = 10_sec;
+
+	// Do nothing until 60 seconds is up
+	if (level.time.seconds() - level.godmod_timer > 60)
+		return;
+
+	// Find eligible players.  They must be alive, not spectating, etc.
+	// Must be an ACTIVE player!
+	for (auto player : active_players()) {
+		if (player->health <= 0 || player->deadflag || !player->solid)
+            continue;
+		else if (player->client->resp.spectator)
+			continue;
+		else
+			eligible_players[playercount++] = ent;
+	}
+
+	// No one's eligible, shove off
+	if (!playercount)
+        return;
+
+	// Who's the lucky sonuvagun?
+	blessed = eligible_players[irandom(playercount)];
+
+	blessed->client->quad_time = timeout;
+	blessed->client->quadfire_time = timeout;
+	blessed->client->enviro_time = timeout;
+	blessed->client->breather_time = timeout;
+	blessed->client->invisible_time = timeout;
+
+	gi.LocBroadcast_Print(PRINT_HIGH, "%s has been blessed...", blessed->client->pers.netname);
+
+	level.godmod_timer = level.time.seconds();
+
+	gi.sound(blessed, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
+}
+// =====================================================================
 
 void Use_Quad(edict_t *ent, gitem_t *item)
 {

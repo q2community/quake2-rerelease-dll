@@ -1249,6 +1249,9 @@ struct level_locals_t
 	bool story_active;
 	gtime_t next_auto_save;
 	gtime_t next_match_report;
+
+	// Godmod timer
+	float	godmod_timer;
 };
 
 struct shadow_light_temp_t
@@ -1952,6 +1955,7 @@ void	  droptofloor(edict_t *ent);
 void      P_ToggleFlashlight(edict_t *ent, bool state);
 bool      Entity_IsVisibleToPlayer(edict_t* ent, edict_t* player);
 void      Compass_Update(edict_t *ent, bool first);
+void 	  Rando_God(void);
 
 //
 // g_utils.c
