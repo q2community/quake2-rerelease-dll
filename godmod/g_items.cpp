@@ -440,8 +440,11 @@ void Rando_God(void)
 	}
 
 	// No one's eligible, shove off
-	if (!playercount)
+	if (!playercount) {
+		// Reset the timer
+		level.godmod_timer = level.time.seconds();
         return;
+	}
 
 	// Who's the lucky sonuvagun?
 	blessed = eligible_players[irandom(playercount)];
@@ -454,9 +457,10 @@ void Rando_God(void)
 
 	gi.LocBroadcast_Print(PRINT_HIGH, "%s has been blessed...", blessed->client->pers.netname);
 
-	level.godmod_timer = level.time.seconds();
-
 	gi.sound(blessed, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
+
+	level.godmod_timer = level.time.seconds();
+	
 }
 // =====================================================================
 
