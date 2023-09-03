@@ -1,0 +1,6 @@
+.vscode
+build
+*.dylib
+*.so
+*.dll
+_deps
