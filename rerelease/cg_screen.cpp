@@ -779,7 +779,7 @@ static void CG_DrawTable(int x, int y, uint32_t width, uint32_t height, int32_t 
         cgi.SCR_DrawChar(x - (CONCHAR_WIDTH * scale), cy, scale, 21, false);
         cgi.SCR_DrawChar((x + width_pixels), cy, scale, 23, false);
     }
-    
+	
     cgi.SCR_DrawColorPic(x, y, width_pixels, height_pixels, "_white", { 0, 0, 0, 255 });
 
     // draw in columns
