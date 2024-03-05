@@ -29,6 +29,10 @@ static cvar_t *scr_maxlines;
 static cvar_t *ui_acc_contrast;
 static cvar_t* ui_acc_alttypeface;
 
+//Speedometer
+static cvar_t *scr_showspeed;
+extern void GetPlayerSpeed(float* speed, float* speedxy);
+
 // static temp data used for hud
 static struct
 {
@@ -667,6 +671,39 @@ static void CG_DrawString (int x, int y, int scale, const char *s, bool alt = fa
     }
 }
 
+/*
+==============
+Speedometer
+==============
+*/
+static void SCR_DrawSpeed(vrect_t hud_vrect, int32_t scale) {
+
+    if (scr_showspeed->value < 1) // Check if enabled
+        return;
+
+    float speed, speedxy;  // speed, horizontal speed
+    int screenWidth, screenHeight;
+    int fontSize = 1 * scale;  // scale the font based on the current resolution
+
+    screenWidth = hud_vrect.width * scale;
+    screenHeight = hud_vrect.height * scale;
+    GetPlayerSpeed(&speed, &speedxy);
+
+    char speedstring[64];
+    snprintf(speedstring, sizeof(speedstring), "%4.2f (%4.2f)QU/s", speed, speedxy);
+
+    // Get width and height of the speedometer string
+    int speedstringWidth = strlen(speedstring) * (8 * fontSize);
+    int speedstringHeight = 10 * fontSize; // Assuming 10 is the height of the string, seems to work well on multiple resolutions
+
+    // Get the bottom right corner coordinates
+    int x = screenWidth - speedstringWidth;
+    int y = screenHeight - speedstringHeight;
+
+    // Draw the speedometer
+    CG_DrawString(x, y, fontSize, speedstring, false, true);
+}
+
 #include <charconv>
 
 /*
@@ -742,7 +779,7 @@ static void CG_DrawTable(int x, int y, uint32_t width, uint32_t height, int32_t 
         cgi.SCR_DrawChar(x - (CONCHAR_WIDTH * scale), cy, scale, 21, false);
         cgi.SCR_DrawChar((x + width_pixels), cy, scale, 23, false);
     }
-
+	
     cgi.SCR_DrawColorPic(x, y, width_pixels, height_pixels, "_white", { 0, 0, 0, 255 });
 
     // draw in columns
@@ -1630,6 +1667,7 @@ static void CG_ExecuteLayoutString (const char *s, vrect_t hud_vrect, vrect_t hu
 static cvar_t *cl_skipHud;
 static cvar_t *cl_paused;
 
+
 /*
 ================
 CL_DrawInventory
@@ -1664,6 +1702,7 @@ static void CG_DrawInventory(const player_state_t *ps, const std::array<int16_t,
     // determine scroll point
     top = selected_num - DISPLAY_ITEMS/2;
     if (num - top < DISPLAY_ITEMS)
+
         top = num - DISPLAY_ITEMS;
     if (top < 0)
         top = 0;
@@ -1744,7 +1783,10 @@ void CG_DrawHUD (int32_t isplit, const cg_server_data_t *data, vrect_t hud_vrect
     // inventory too
     if (ps->stats[STAT_LAYOUTS] & LAYOUTS_INVENTORY)
         CG_DrawInventory(ps, data->inventory, hud_vrect, scale);
-}
+
+    // Draw speedometer if enabled
+    SCR_DrawSpeed(hud_vrect, scale);
+}   
 
 /*
 ================
@@ -1775,6 +1817,6 @@ void CG_InitScreen()
     scr_maxlines    = cgi.cvar ("scr_maxlines", "4",      CVAR_ARCHIVE);
     ui_acc_contrast = cgi.cvar ("ui_acc_contrast", "0",   CVAR_NOFLAGS);
     ui_acc_alttypeface = cgi.cvar("ui_acc_alttypeface", "0", CVAR_NOFLAGS);
-
+    scr_showspeed = cgi.cvar("scr_showspeed", "0", CVAR_ARCHIVE);
     hud_data = {};
 }

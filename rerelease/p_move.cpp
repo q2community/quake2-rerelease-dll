@@ -6,6 +6,9 @@
 #define GAME_INCLUDE
 #include "bg_local.h"
 
+// Speedometer
+extern void GetPlayerSpeed(float* speed, float* speedxy);
+
 // [Paril-KEX] generic code to detect & fix a stuck object
 stuck_result_t G_FixStuckObject_Generic(vec3_t &origin, const vec3_t &own_mins, const vec3_t &own_maxs, std::function<stuck_object_trace_fn_t> trace)
 {
@@ -1556,6 +1559,18 @@ static void PM_ScreenEffects()
 		G_AddBlend(0.0f, 0.1f, 0.05f, 0.6f, pm->screen_blend);
 	else if (contents & CONTENTS_WATER)
 		G_AddBlend(0.5f, 0.3f, 0.2f, 0.4f, pm->screen_blend);
+}
+
+/*
+==================
+Speedometer
+
+==================
+ */
+
+void GetPlayerSpeed(float* speed, float* speedxy) {
+	*speedxy = sqrt(pml.velocity[0] * pml.velocity[0] + pml.velocity[1] * pml.velocity[1]);
+	*speed = pml.velocity.length();
 }
 
 /*
